@@ -134,7 +134,6 @@ class SheetData():
                 temp_row = i
                 break
         
-        print(temp_column,temp_row)
         if(temp_row==0):
             self.ws.cell(row=self.ws.max_row+1,column=1,value=self.ws.max_row-2)
             self.ws.cell(row=self.ws.max_row,column=2,value=day)
@@ -152,6 +151,7 @@ class SheetData():
         else:
             print("Không tìm thấy dữ liệu")                 
         self.wb.save(self.file_name)
+
 
 
 
