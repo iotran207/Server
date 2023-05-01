@@ -19,7 +19,6 @@ class User(BaseModel):
 class StudenReason(BaseModel):
     org: str = None
     id: int = None
-    password: str = None
     reason: str = None
     note: str = None
 
@@ -79,7 +78,7 @@ async def Assistant(message: Message):
 async def ReasonStudent(reason: StudenReason):
     try:
         org = OrgData(reason.org)
-        org.InsertToData(reason.id,reason.password,reason.reason,reason.note)
+        org.InsertToData(reason.id,reason.reason,reason.note)
         return {"status": "success", "message": "Đã gửi yêu cầu"}
     except Exception as error:
         print(error)

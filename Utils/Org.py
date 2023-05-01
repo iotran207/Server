@@ -39,62 +39,64 @@ class OrgData:
         self.org = org
         self.file_name = f"Data/{org}/{file_name}"
         
-    def InsertToData(self, id: int,password:str, reason: str, note: str = ""):
-        day = datetime.datetime.now().strftime("%d/%m/%Y-%H:%M:%S")
-        name = self.user.GetUser(id,password)["name"]
-        clas = self.user.GetUser(id,password)["class"]
-        max_row = self.ws.max_row
-        row_num = max_row + 1
-        if(reason=="chậm"):
-            self.ws.cell(row=row_num, column=1, value=row_num - 4)
-            self.ws.cell(row=row_num, column=2, value=day)
-            self.ws.cell(row=row_num, column=3, value=id)
-            self.ws.cell(row=row_num, column=4, value=name)
-            self.ws.cell(row=row_num, column=5, value=clas)
-            self.ws.cell(row=row_num, column=6, value="x")
-            self.ws.cell(row=row_num, column=12, value=note)
-        elif(reason=="bỏ giờ"):
-            self.ws.cell(row=row_num, column=1, value=row_num - 4)
-            self.ws.cell(row=row_num, column=2, value=day)
-            self.ws.cell(row=row_num, column=3, value=id)
-            self.ws.cell(row=row_num, column=4, value=name)
-            self.ws.cell(row=row_num, column=5, value=clas)
-            self.ws.cell(row=row_num, column=7, value="x")
-            self.ws.cell(row=row_num, column=12, value=note)
-        elif(reason=="phù hiệu"):
-            self.ws.cell(row=row_num, column=1, value=row_num - 4)
-            self.ws.cell(row=row_num, column=2, value=day)
-            self.ws.cell(row=row_num, column=3, value=id)
-            self.ws.cell(row=row_num, column=4, value=name)
-            self.ws.cell(row=row_num, column=5, value=clas)
-            self.ws.cell(row=row_num, column=8, value="x")
-            self.ws.cell(row=row_num, column=12, value=note)
-        elif(reason=="đồng phục"):
-            self.ws.cell(row=row_num, column=1, value=row_num - 4)
-            self.ws.cell(row=row_num, column=2, value=day)
-            self.ws.cell(row=row_num, column=3, value=id)
-            self.ws.cell(row=row_num, column=4, value=name)
-            self.ws.cell(row=row_num, column=5, value=clas)
-            self.ws.cell(row=row_num, column=9, value="x")
-            self.ws.cell(row=row_num, column=12, value=note)
-        elif(reason=="điện thoại"):
-            self.ws.cell(row=row_num, column=1, value=row_num - 4)
-            self.ws.cell(row=row_num, column=2, value=day)
-            self.ws.cell(row=row_num, column=3, value=id)
-            self.ws.cell(row=row_num, column=4, value=name)
-            self.ws.cell(row=row_num, column=5, value=clas)
-            self.ws.cell(row=row_num, column=10, value="x")
-            self.ws.cell(row=row_num, column=12, value=note)
-        elif(reason=="khác"):
-            self.ws.cell(row=row_num, column=1, value=row_num - 4)
-            self.ws.cell(row=row_num, column=2, value=day)
-            self.ws.cell(row=row_num, column=3, value=id)
-            self.ws.cell(row=row_num, column=4, value=name)
-            self.ws.cell(row=row_num, column=5, value=clas)
-            self.ws.cell(row=row_num, column=11, value="x")
-            self.ws.cell(row=row_num, column=12, value=note)
-        self.wb.save(self.file_name)
-    
+    def InsertToData(self, id: int,reason: str, note: str = ""):
+        try:
+            day = datetime.datetime.now().strftime("%d/%m/%Y-%H:%M:%S")
+            name = self.user.GetUserFromID(id)["name"]
+            clas = self.user.GetUserFromID(id)["class"]
+            max_row = self.ws.max_row
+            row_num = max_row + 1
+            if(reason=="chậm"):
+                self.ws.cell(row=row_num, column=1, value=row_num - 4)
+                self.ws.cell(row=row_num, column=2, value=day)
+                self.ws.cell(row=row_num, column=3, value=id)
+                self.ws.cell(row=row_num, column=4, value=name)
+                self.ws.cell(row=row_num, column=5, value=clas)
+                self.ws.cell(row=row_num, column=6, value="x")
+                self.ws.cell(row=row_num, column=12, value=note)
+            elif(reason=="bỏ giờ"):
+                self.ws.cell(row=row_num, column=1, value=row_num - 4)
+                self.ws.cell(row=row_num, column=2, value=day)
+                self.ws.cell(row=row_num, column=3, value=id)
+                self.ws.cell(row=row_num, column=4, value=name)
+                self.ws.cell(row=row_num, column=5, value=clas)
+                self.ws.cell(row=row_num, column=7, value="x")
+                self.ws.cell(row=row_num, column=12, value=note)
+            elif(reason=="phù hiệu"):
+                self.ws.cell(row=row_num, column=1, value=row_num - 4)
+                self.ws.cell(row=row_num, column=2, value=day)
+                self.ws.cell(row=row_num, column=3, value=id)
+                self.ws.cell(row=row_num, column=4, value=name)
+                self.ws.cell(row=row_num, column=5, value=clas)
+                self.ws.cell(row=row_num, column=8, value="x")
+                self.ws.cell(row=row_num, column=12, value=note)
+            elif(reason=="đồng phục"):
+                self.ws.cell(row=row_num, column=1, value=row_num - 4)
+                self.ws.cell(row=row_num, column=2, value=day)
+                self.ws.cell(row=row_num, column=3, value=id)
+                self.ws.cell(row=row_num, column=4, value=name)
+                self.ws.cell(row=row_num, column=5, value=clas)
+                self.ws.cell(row=row_num, column=9, value="x")
+                self.ws.cell(row=row_num, column=12, value=note)
+            elif(reason=="điện thoại"):
+                self.ws.cell(row=row_num, column=1, value=row_num - 4)
+                self.ws.cell(row=row_num, column=2, value=day)
+                self.ws.cell(row=row_num, column=3, value=id)
+                self.ws.cell(row=row_num, column=4, value=name)
+                self.ws.cell(row=row_num, column=5, value=clas)
+                self.ws.cell(row=row_num, column=10, value="x")
+                self.ws.cell(row=row_num, column=12, value=note)
+            elif(reason=="khác"):
+                self.ws.cell(row=row_num, column=1, value=row_num - 4)
+                self.ws.cell(row=row_num, column=2, value=day)
+                self.ws.cell(row=row_num, column=3, value=id)
+                self.ws.cell(row=row_num, column=4, value=name)
+                self.ws.cell(row=row_num, column=5, value=clas)
+                self.ws.cell(row=row_num, column=11, value="x")
+                self.ws.cell(row=row_num, column=12, value=note)
+            self.wb.save(self.file_name)
+        except Exception as error:
+            print(error)
 class SheetData():
     def __init__(self,org: str,clas:str):
         if(os.path.exists(f"Check/{org}")==False):
