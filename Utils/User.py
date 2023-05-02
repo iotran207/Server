@@ -25,7 +25,8 @@ class UserData:
                 "birthday":data[6],
                 "class":data[7],
                 "phone":data[8],
-                "car":data[9]
+                "car":data[9],
+                "price":data[10]
             }        
         
     def GetUserFromID(self,id):
