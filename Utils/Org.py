@@ -97,6 +97,7 @@ class OrgData:
             self.wb.save(self.file_name)
         except Exception as error:
             print(error)
+            
 class SheetData():
     def __init__(self,org: str,clas:str):
         if(os.path.exists(f"Check/{org}")==False):
@@ -153,6 +154,56 @@ class SheetData():
         else:
             print("Không tìm thấy dữ liệu")                 
         self.wb.save(self.file_name)
+
+class DataBus():
+    def __init__(self,id_bus,org:str):
+        self.id_bus = id_bus
+        self.user = UserData()
+        if(os.path.exists(path=f"Bus/{org}")==False):
+            os.mkdir(path=f"Bus/{org}")
+        try:
+            self.wb = openpyxl.load_workbook(filename=f"Bus/{org}/{id_bus}.xlsx")
+        except FileNotFoundError:
+            self.wb = openpyxl.load_workbook(filename="example_bus.xlsx")
+            self.wb.save(filename=f"Bus/{org}/{id_bus}.xlsx")
+            self.wb = openpyxl.load_workbook(filename=f"Bus/{org}/{id_bus}.xlsx")
+
+        self.file_name = f"Bus/{org}/{id_bus}.xlsx"
+
+    def InsertToData(self,user_id,note:str):
+
+        name = self.user.GetUserFromID(user_id)["name"]
+        clas = self.user.GetUserFromID(user_id)["class"]
+        day = datetime.datetime.now().strftime("%d-%m-%Y")
+        time = datetime.datetime.now().strftime("%H:%M:%S")
+        if(day not in self.wb.sheetnames):
+            self.wb.create_sheet(day)
+            self.wb.save(filename=self.file_name)
+            self.ws = self.wb[day]
+            self.ws.cell(row=1,column=1,value="STT")
+            self.ws.cell(row=1,column=2,value="Thời gian")
+            self.ws.cell(row=1,column=3,value="Mã định danh")
+            self.ws.cell(row=1,column=4,value="Họ và tên")
+            self.ws.cell(row=1,column=5,value="Lớp")
+            self.ws.cell(row=1,column=6,value="Ghi chú")
+            self.wb.save(filename=self.file_name)
+        else:
+            pass
+        
+        self.ws = self.wb[day]
+        max_row = self.ws.max_row
+        self.ws.cell(row=max_row+1,column=1,value=max_row)
+        self.ws.cell(row=max_row+1,column=2,value=time)
+        self.ws.cell(row=max_row+1,column=3,value=user_id)
+        self.ws.cell(row=max_row+1,column=4,value=name)
+        self.ws.cell(row=max_row+1,column=5,value=clas)
+        self.ws.cell(row=max_row+1,column=6,value=note)
+        self.wb.save(filename=self.file_name)
+
+
+    
+
+        
 
 
 

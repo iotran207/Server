@@ -4,7 +4,7 @@ from pydantic import BaseModel
 import requests
 import uvicorn
 import random
-from Utils.Org import OrgData
+from Utils.Org import OrgData,SheetData,DataBus
 
 class User(BaseModel):
     id: int = None
@@ -27,6 +27,12 @@ class Message(BaseModel):
 
 class QR(BaseModel):
     id: int = None
+
+class Bus(BaseModel):
+    org: str = None
+    bus_id: str = None
+    note: str = None
+    user_id: str = None
 
 app = FastAPI()
 userData = UserData()
@@ -87,9 +93,20 @@ async def ReasonStudent(reason: StudenReason):
 @app.post("/GetDataFromQR")
 async def GetDataFromQR(data:QR):
     try:
-        user = userData()
+        user = UserData()
         return {"status": "success", "message":user.GetUserFromQR(data.id)}
     except Exception as error:
         print(error)
+        return {"status": "error", "message": "Lỗi không xác định"}
+    
+@app.post("/CheckBus") 
+async def CheckBus(data:Bus):
+    try:
+        bus = DataBus(data.bus_id,data.org)
+        return {"status": "success", "message":bus.InsertToData(data.user_id,data.note)}
+    except Exception as error:
+        print(error)
+        return {"status": "error", "message": "Lỗi không xác định"}
+    
 
 
