@@ -2,7 +2,6 @@ from fastapi import FastAPI
 from Utils.User import UserData
 from pydantic import BaseModel
 import requests
-import uvicorn
 import random
 from Utils.Org import OrgData,SheetData,DataBus
 
@@ -15,6 +14,9 @@ class User(BaseModel):
     city: str = None
     birthday: str = None
     clas: str = None
+    phone: int = None
+    car: str = None
+    price: int = None
 
 class StudenReason(BaseModel):
     org: str = None
@@ -45,7 +47,7 @@ async def root():
 async def CreateUser(user: User):
     randomID = random.randint(100000,999999)
     try:
-        userData.CreateUser(randomID,user.name,user.password,user.role,user.org,user.city,user.birthday,user.clas)
+        userData.CreateUser(randomID,user.name,user.password,user.role,user.org,user.city,user.birthday,user.clas,user.phone,user.car,user.price)
         return {"status": "success", "message": randomID}
     except Exception as error:
         if(error == "UNIQUE constraint failed: DATA_USER.ID"):
@@ -53,7 +55,7 @@ async def CreateUser(user: User):
             while(errorCreate == "UNIQUE constraint failed: DATA_USER.ID"):
                 try:
                     randomID = random.randint(100000,999999)
-                    userData.CreateUser(randomID,user.name,user.password,user.role,user.org,user.city,user.birthday,user.clas)
+                    userData.CreateUser(randomID,user.name,user.password,user.role,user.org,user.city,user.birthday,user.clas,user.phone,user.car,user.price)
                 except Exception as errorCreate:
                     print(errorCreate)
         elif(error == "UNIQUE constraint failed: DATA_USER.NAME"):
@@ -62,7 +64,7 @@ async def CreateUser(user: User):
             print(error)
             return {"status": "error", "message": "Lỗi không xác định"}
         
-@app.post("/GetUser")
+@app.post("/Login")
 async def GetUser(user: User):
     try:
         data=userData.GetUser(user.id,user.password)
@@ -90,11 +92,11 @@ async def ReasonStudent(reason: StudenReason):
         print(error)
         return {"status": "error", "message": "Lỗi không xác định"}
     
-@app.post("/GetDataFromQR")
-async def GetDataFromQR(data:QR):
+@app.post("/GetUserFromID")
+async def GetUserFromID(user: User):
     try:
-        user = UserData()
-        return {"status": "success", "message":user.GetUserFromQR(data.id)}
+        data = userData.GetUserFromID(user.id)
+        return {"status": "success", "message": data}
     except Exception as error:
         print(error)
         return {"status": "error", "message": "Lỗi không xác định"}
@@ -108,5 +110,13 @@ async def CheckBus(data:Bus):
         print(error)
         return {"status": "error", "message": "Lỗi không xác định"}
     
+@app.post("/DeleteUser")
+async def DeleteUser(user: User):
+    try:
+        userData.DeleteUser(user.id)
+        return {"status": "success", "message": "Đã xóa thành công"}
+    except Exception as error:
+        print(error)
+        return {"status": "error", "message": "Lỗi không xác định"}
 
 
