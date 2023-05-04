@@ -78,7 +78,8 @@ async def GetUser(user: User):
 @app.post("/Assistant")
 async def Assistant(message: Message):
     try:
-        return {"status": "success", "message": ChatBot(message.content)}
+        wait=1
+        return {"status": "success", "message": ChatBot(message.content,wait=wait)}
     except Exception as error:
         print(error)
         return {"status": "error", "message": "Lỗi không xác định"}
