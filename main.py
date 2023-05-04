@@ -4,6 +4,7 @@ from pydantic import BaseModel
 import requests
 import random
 from Utils.Org import OrgData,SheetData,DataBus
+from Utils.Chatbot import ChatBot
 
 class User(BaseModel):
     id: int = None
@@ -17,6 +18,7 @@ class User(BaseModel):
     phone: int = None
     car: str = None
     price: int = None
+    token: str = None
 
 class StudenReason(BaseModel):
     org: str = None
@@ -76,8 +78,7 @@ async def GetUser(user: User):
 @app.post("/Assistant")
 async def Assistant(message: Message):
     try:
-        r = requests.post("https://api.simsimi.vn/v1/simtalk", headers = {"Content-Type": "application/x-www-form-urlencoded"}, data = {"text": f"{message.content}", "lc": "vn"})
-        return {"status": "success", "message": r.json()["message"]}
+        return {"status": "success", "message": ChatBot(message.content)}
     except Exception as error:
         print(error)
         return {"status": "error", "message": "Lỗi không xác định"}
@@ -119,4 +120,20 @@ async def DeleteUser(user: User):
         print(error)
         return {"status": "error", "message": "Lỗi không xác định"}
 
+@app.post("/AddToken")
+async def AddToken(user: User):
+    try:
+        userData.AddToken(user.id,user.token)
+        return {"status": "success", "message": "Đã thêm token"}
+    except Exception as error:
+        print(error)
+        return {"status": "error", "message": "Lỗi không xác định"}
+    
+@app.post("/GetToken")
+async def GetToken(user: User):
+    try:
+        return {"status": "success", "message": userData.GetToken(user.id)}
+    except Exception as error:
+        print(error)
+        return {"status": "error", "message": "Lỗi không xác định"}
 

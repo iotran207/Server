@@ -50,4 +50,16 @@ class UserData:
     def DeleteUser(self,id):
         self.database.execute("DELETE FROM DATA_USER WHERE user_id = ?", (id,))
         self.db.commit()
+
+    def AddToken(self,id,token):
+        self.database.execute("UPDATE DATA_USER SET token = ? WHERE user_id = ?", (token,id))
+        self.db.commit()
+    
+    def GetToken(self,id):
+        self.database.execute("SELECT token FROM DATA_USER WHERE user_id = ?", (id,))
+        data=self.database.fetchone()
+        if(data == None):
+            raise Exception("Không tìm thấy tài khoản")
+        else:
+            return data[0]
     
