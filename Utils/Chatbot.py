@@ -4,7 +4,7 @@ import random
 def requests_api(question):
     return requests.post("https://api.simsimi.vn/v2/simtalk", headers = {"Content-Type": "application/x-www-form-urlencoded"}, data = {"text": f"{question}", "lc": "vn"}).json()["message"]
 
-def ChatBot(question:str):
+def ChatBot(question:str,wait:int):
     data = requests_api(question)
     list = [
         "lồn",
@@ -12,7 +12,9 @@ def ChatBot(question:str):
         "cặc",
         "đụ",
         "bố"
-        "cút"
+        "cút",
+        "đần",
+        "ngu"
     ]
     
     list_warn = [
@@ -21,6 +23,9 @@ def ChatBot(question:str):
         "mệt",
         "stress",
         "nhọc",
+        "áp",
+        "lực",
+        "phiền"
         "chán",
     ]
     
@@ -49,7 +54,8 @@ def ChatBot(question:str):
         "kết thúc",
         "chết",
         "tử vong",
-        "sống"
+        "sống",
+        "gia đình"
     ]
 
     emoji = [
@@ -160,8 +166,9 @@ def ChatBot(question:str):
             else:
                 choice_emoji = random.choice(check_list)
                 for i in list:
-                    if i in data.lower().split(" "):
-                        ChatBot(question)
+                    if i in data.lower().split(" ") and wait<=3:
+                        wait = wait + 1
+                        ChatBot(question,wait=wait)
 
                 for i in data.lower().split(" "):
                     if(i=="simsimi"):
@@ -175,14 +182,14 @@ def ChatBot(question:str):
                     if(i=="mày"):
                         data=data.replace("mày","you")
 
+                if(data=="Required parameter is not present"):
+                    data = "Tớ không hiểu cậu đang nói gì cả, cậu có thể nói rõ hơn được không?"
 
                 if(choice_emoji=="True"):
                     data = data + " " + random.choice(Kaomoji)
                 else:
                     data = data + " " + random.choice(emoji)
                 return data
-    
-while(True):
-    question = input("You: ")
-    print(">> Bot: ",ChatBot(question))
+                wait= 1
+
     
