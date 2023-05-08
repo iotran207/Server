@@ -1,12 +1,16 @@
 import sqlite3
+import os
+from deepface import DeepFace
+import random
+import shutil
 
 class UserData:
     def __init__(self):
         self.db = sqlite3.connect("database.sqlite")
         self.database = self.db.cursor()
 
-    def CreateUser(self,id,name,password,role,org,city,birthday,clas,phone,car,price):
-        self.database.execute("INSERT INTO DATA_USER VALUES (?,?,?,?,?,?,?,?,?,?,?)", (id,name,password,role,org,city,birthday,clas,phone,car,price))
+    def CreateUser(self,id,name,password,role,org,city,birthday,clas,phone,car,price,token):
+        self.database.execute("INSERT INTO DATA_USER VALUES (?,?,?,?,?,?,?,?,?,?,?,?)", (id,name,password,role,org,city,birthday,clas,phone,car,price,token))
         self.db.commit()
 
     def GetUser(self,id,password):
@@ -62,4 +66,29 @@ class UserData:
             raise Exception("Không tìm thấy tài khoản")
         else:
             return data[0]
+        
+class DeepFaceCheck:
+    def __init__(self,org):
+        self.org = org
+
+    def AddImage(self,img_name:str,id):
+        try:
+            DeepFace.detectFace(f"Temp/{img_name}")
+            shutil.move(f"{img_name}",f"Dataset/{self.org}/{id}/{random.randint(1,999)}.png")
+        except:
+            raise Exception("Không tìm thấy khuôn mặt")
+
+    def CheckFace(self,img_name:str):
+        for id in os.listdir(f"Dataset/{self.org}"):
+            for img in os.listdir(f"Dataset/{self.org}/{id}"):
+                try:
+                    result = DeepFace.verify(f"Dataset/{self.org}/{id}/{img}",f"Temp/{img_name}")
+                    print(result)
+                    if(result["verified"] == True):
+                        return id
+                except:
+                    pass
+        return None
+
+
     

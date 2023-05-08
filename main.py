@@ -1,10 +1,13 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, File, UploadFile
 from Utils.User import UserData
 from pydantic import BaseModel
-import requests
 import random
 from Utils.Org import OrgData,SheetData,DataBus
 from Utils.Chatbot import ChatBot
+import shutil
+import os
+from Utils.User import DeepFaceCheck
+
 
 class User(BaseModel):
     id: int = None
@@ -38,6 +41,15 @@ class Bus(BaseModel):
     note: str = None
     user_id: str = None
 
+class Schedule(BaseModel):
+    org: str = None
+    id: int = None
+    collumn : str = None
+
+class Daily(BaseModel):
+    org: str = None
+    id: int = None
+
 app = FastAPI()
 userData = UserData()
 
@@ -49,7 +61,7 @@ async def root():
 async def CreateUser(user: User):
     randomID = random.randint(100000,999999)
     try:
-        userData.CreateUser(randomID,user.name,user.password,user.role,user.org,user.city,user.birthday,user.clas,user.phone,user.car,user.price)
+        userData.CreateUser(randomID,user.name,user.password,user.role,user.org,user.city,user.birthday,user.clas,user.phone,user.car,user.price,user.token)
         return {"status": "success", "message": randomID}
     except Exception as error:
         if(error == "UNIQUE constraint failed: DATA_USER.ID"):
@@ -57,7 +69,7 @@ async def CreateUser(user: User):
             while(errorCreate == "UNIQUE constraint failed: DATA_USER.ID"):
                 try:
                     randomID = random.randint(100000,999999)
-                    userData.CreateUser(randomID,user.name,user.password,user.role,user.org,user.city,user.birthday,user.clas,user.phone,user.car,user.price)
+                    userData.CreateUser(randomID,user.name,user.password,user.role,user.org,user.city,user.birthday,user.clas,user.phone,user.car,user.price,user.token)
                 except Exception as errorCreate:
                     print(errorCreate)
         elif(error == "UNIQUE constraint failed: DATA_USER.NAME"):
@@ -137,4 +149,34 @@ async def GetToken(user: User):
     except Exception as error:
         print(error)
         return {"status": "error", "message": "Lỗi không xác định"}
+    
+@app.post("/Schedule")
+async def Schedule(user: Schedule):
+    try:
+        print(user)
+        sheet = SheetData(org=user.org,ID=user.id)
+        sheet.InsertToData(user.collumn)
+        return {"status": "success", "message": "Đã thêm điểm danh"}
+    except Exception as error:
+        print(error)
+        return {"status": "error", "message": "Lỗi không xác định"}
+    
+@app.post("/Daily")
+async def Daily(user:Daily):
+    try:
+        sheetdata = SheetData(org=user.org,ID=user.id)
+        sheetdata.Daily()
+        return {"status": "success", "message": "Đã thêm điểm danh"}
+    except Exception as error:
+        return {"status": "error", "message": "Lỗi không xác định"}
 
+@app.post("/CheckImage")
+async def CheckImage(file_upload: UploadFile = File(),org:str=None):
+    try:
+        shutil.copyfileobj(file_upload.file, open(f"Temp/{file_upload.filename}", 'wb'))
+        face = DeepFaceCheck(org)
+        check = face.CheckFace(f"{file_upload.filename}")
+        return {"status": "success", "message": check}
+    except Exception as error:
+        print(error)
+        return {"status": "error", "message": "Lỗi không xác định"}

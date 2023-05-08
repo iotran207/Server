@@ -99,7 +99,8 @@ class OrgData:
             print(error)
             
 class SheetData():
-    def __init__(self,org: str,clas:str):
+    def __init__(self,org: str,ID:int):
+        clas = UserData().GetUserFromID(ID)["class"]
         if(os.path.exists(f"Check/{org}")==False):
             os.mkdir(f"Check/{org}")
         else:
@@ -110,20 +111,25 @@ class SheetData():
                 self.wb.save(f"Check/{org}/{clas}.xlsx")
                 self.wb = openpyxl.load_workbook(f"Check/{org}/{clas}.xlsx")
     
+        self.id = ID
         self.org = org
         self.clas = clas
         self.file_name = f"Check/{org}/{clas}.xlsx"
-        self.ws = self.wb.active
         self.user = UserData()
+        self.ws = self.wb.active
 
     def MakeNewData(self,name_column:str):
-        temp = self.ws.max_column
-        self.ws.cell(row=3,column=temp+1,value=name_column)
-        self.wb.save(self.file_name)
+        try:
+            temp = self.ws.max_column
+            self.ws.cell(row=3,column=temp+1,value=name_column)
+            self.wb.save(self.file_name)
+        except Exception as error:
+            print(error)
+            pass
 
-    def InsertToData(self,id,password,name_column:str,note:str):
-        name = self.user.GetUser(id,password)["name"]
-        clas = self.user.GetUser(id,password)["class"]
+    def InsertToData(self,name_column:str,note:str=None):
+        name = self.user.GetUserFromID(self.id)["name"]
+        clas = self.user.GetUserFromID(self.id)["class"]
         day = datetime.datetime.now().strftime("%d/%m/%Y - %H:%M:%S")
         temp_column = 0
         temp_row = 0
@@ -140,7 +146,7 @@ class SheetData():
         if(temp_row==0):
             self.ws.cell(row=self.ws.max_row+1,column=1,value=self.ws.max_row-2)
             self.ws.cell(row=self.ws.max_row,column=2,value=day)
-            self.ws.cell(row=self.ws.max_row,column=3,value=id)
+            self.ws.cell(row=self.ws.max_row,column=3,value=self.id)
             self.ws.cell(row=self.ws.max_row,column=4,value=name)
             self.ws.cell(row=self.ws.max_row,column=5,value=clas)
             self.ws.cell(row=self.ws.max_row,column=6,value=note)
@@ -152,8 +158,56 @@ class SheetData():
             self.ws.cell(row=temp_row,column=temp_column,value="x")
             self.ws.cell(row=temp_row,column=12,value=note)
         else:
-            print("Không tìm thấy dữ liệu")                 
+            print("Không tìm thấy dữ liệu")               
         self.wb.save(self.file_name)
+
+    def Daily(self,note:str=None):
+        if(os.path.exists(f"Daily/{self.org}")==False):
+            os.mkdir(f"Daily/{self.org}")
+        else:
+            try:
+                self.wb = openpyxl.load_workbook(f"Daily/{self.org}/{self.clas}.xlsx")
+            except FileNotFoundError:
+                self.wb = openpyxl.load_workbook("example_daily.xlsx")
+                self.wb.save(f"Daily/{self.org}/{self.clas}.xlsx")
+                self.wb = openpyxl.load_workbook(f"Daily/{self.org}/{self.clas}.xlsx")
+        
+        self.file_name = f"Daily/{self.org}/{self.clas}.xlsx"
+        self.ws = self.wb.active
+        name = self.user.GetUserFromID(self.id)["name"]
+        clas = self.user.GetUserFromID(self.id)["class"]
+        day = datetime.datetime.now().strftime("%d-%m-%Y")
+        time = datetime.datetime.now().strftime("%H:%M:%S")
+        if(day not in self.wb.sheetnames):
+            self.wb.create_sheet(day)
+            self.ws = self.wb[day]
+            self.ws.cell(row=1,column=1,value="STT")
+            self.ws.cell(row=1,column=2,value="Ngày")
+            self.ws.cell(row=1,column=3,value="ID")
+            self.ws.cell(row=1,column=4,value="Tên")
+            self.ws.cell(row=1,column=5,value="Lớp")
+            self.ws.cell(row=1,column=6,value="Ghi chú")
+            self.ws.cell(row=1,column=7,value="Điểm danh")
+            self.ws.cell(row=1,column=8,value="Ghi chú")
+            self.wb.save(self.file_name)
+
+        self.ws = self.wb[day]
+
+        self.ws = self.wb[day]
+        max_row = self.ws.max_row
+        self.ws.cell(row=max_row+1,column=1,value=max_row)
+        self.ws.cell(row=max_row+1,column=2,value=time)
+        self.ws.cell(row=max_row+1,column=3,value=self.id)
+        self.ws.cell(row=max_row+1,column=4,value=name)
+        self.ws.cell(row=max_row+1,column=5,value=clas)
+        self.ws.cell(row=max_row+1,column=6,value=note)
+        self.wb.save(filename=self.file_name)
+
+
+        
+
+
+
 
 class DataBus():
     def __init__(self,id_bus,org:str):
@@ -171,7 +225,6 @@ class DataBus():
         self.file_name = f"Bus/{org}/{id_bus}.xlsx"
 
     def InsertToData(self,user_id,note:str):
-
         name = self.user.GetUserFromID(user_id)["name"]
         clas = self.user.GetUserFromID(user_id)["class"]
         day = datetime.datetime.now().strftime("%d-%m-%Y")
