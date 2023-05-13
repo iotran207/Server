@@ -8,6 +8,10 @@ import shutil
 import os
 from Utils.User import DeepFaceCheck
 
+class ChangePassword(BaseModel):
+    id: int = None
+    password: str = None
+    newpassword: str = None
 
 class User(BaseModel):
     id: int = None
@@ -180,3 +184,32 @@ async def CheckImage(file_upload: UploadFile = File(),org:str=None):
     except Exception as error:
         print(error)
         return {"status": "error", "message": "Lỗi không xác định"}
+    
+@app.post("/ChangePassword")
+async def ChangePassword(user: ChangePassword):
+    try:
+        userData = UserData()
+        userData.ChangePassword(user.id,user.password,user.newpassword)
+        return {"status": "success", "message": "Đã đổi mật khẩu"}
+    except Exception as error:
+        print(error)
+        return {"status": "error", "message": "Lỗi không xác định"}
+
+@app.post("/DeleteRole")
+async def DeleteRole(user: User):
+    try:
+        status = userData.DeleteRole(user.id,user.role)
+        return {"message": status}
+    except Exception as error:
+        print(error)
+        return {"status": "error", "message": "Lỗi không xác định"}
+    
+@app.post("/AddRole")
+async def AddRole(user: User):
+    try:
+        status = userData.AddRole(user.id,user.role)
+        return {"message": status}
+    except Exception as error:
+        print(error)
+        return {"status": "error", "message": "Lỗi không xác định"}
+

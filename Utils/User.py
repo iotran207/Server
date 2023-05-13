@@ -66,6 +66,43 @@ class UserData:
             raise Exception("Không tìm thấy tài khoản")
         else:
             return data[0]
+    
+    def ChangePassword(self,id,oldpassword:str,newpassword:str):
+        try:
+            self.database.execute("UPDATE DATA_USER SET user_password = ? WHERE user_id = ? AND user_password = ?", (newpassword,id,oldpassword))
+            self.db.commit()
+        except Exception as error:
+            raise Exception(error)
+        
+    def DeleteRole(self,id:int,role:str):
+        try:
+            data_role = self.GetUserFromID(id)["role"]
+            list_role = data_role.split(" ")
+            if(role not in list_role):
+                return "Không tồn tại role"
+            else:
+                list_role.remove(role)
+                data_role_replace = "".join(list_role)
+                self.database.execute("UPDATE DATA_USER SET user_role = ? WHERE user_id = ?", (data_role_replace,id))
+                self.db.commit()
+                return "Đã xóa role thành công"
+        except Exception as error:
+            raise Exception(error)
+    
+    def AddRole(self,id:int,role:str):
+        try:
+            data_role = self.GetUserFromID(id)["role"]
+            list_role = data_role.split(" ")
+            if(role in list_role):
+                return "Role đã tồn tại"
+            else:
+                list_role.append(" "+role)
+                data_role_replace = "".join(list_role)
+                self.database.execute("UPDATE DATA_USER SET user_role = ? WHERE user_id = ?", (data_role_replace,id))
+                self.db.commit()
+                return "Đã thêm role thành công"
+        except Exception as error:
+            raise Exception(error)
         
 class DeepFaceCheck:
     def __init__(self,org):
@@ -89,6 +126,7 @@ class DeepFaceCheck:
                 except:
                     pass
         return None
+
 
 
     
